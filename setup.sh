@@ -13,6 +13,11 @@ sudo ln -s /usr/bin/g++-6 /usr/bin/g++
 sudo rm /usr/bin/gcc
 sudo ln -s /usr/bin/gcc-6 /usr/bin/gcc
 
+# Install clang-format
+sudo apt-get install clang-format-3.6
+sudo rm -rf /usr/bin/clang-format
+sudo ln -s /usr/bin/clang-format-3.6 /usr/bin/clang-format
+
 # Setup VIM
 rvm get head
 sudo rvm install 2.3.1

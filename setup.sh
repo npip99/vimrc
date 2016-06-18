@@ -1,7 +1,12 @@
 #!/bin/sh
 
-# Update GCC
+# Update apt-get
 sudo apt-get update
+
+# Install Java 7
+sudo apt-get install openjdk-7-jdk
+
+# Update GCC
 sudo apt-get install g++-6
 sudo rm /usr/bin/g++                                                                                                              
 sudo ln -s /usr/bin/g++-6 /usr/bin/g++      

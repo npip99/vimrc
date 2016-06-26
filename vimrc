@@ -170,7 +170,10 @@ endif
 let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
 hi Pmenu ctermbg=Grey
 
-" Customize ClangFormat
+" ----- auto-pairs settings -----
+175 let g:AutoPairsMapSpace = 0
+
+" ----- clang-format settings -----
 let g:clang_format#style_options = {
             \ "AccessModifierOffset" : -4,
             \ "AllowShortIfStatementsOnASingleLine" : "true",

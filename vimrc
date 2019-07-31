@@ -171,7 +171,7 @@ let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
 hi Pmenu ctermbg=Grey
 
 " ----- auto-pairs settings -----
-175 let g:AutoPairsMapSpace = 0
+let g:AutoPairsMapSpace = 0
 
 " ----- clang-format settings -----
 let g:clang_format#style_options = {

@@ -25,6 +25,8 @@ Plugin 'airblade/vim-gitgutter'
 Plugin 'jiangmiao/auto-pairs'
 Plugin 'rhysd/vim-clang-format'
 Plugin 'tpope/vim-sleuth'
+Plugin 'octol/vim-cpp-enhanced-highlight'
+Plugin 'sonph/onehalf', {'rtp': 'vim/'}
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -55,10 +57,12 @@ set relativenumber
 set showcmd
 set incsearch
 set hlsearch
+set cursorline
 
-syntax on
+syntax enable
 
-colorscheme wombat
+colorscheme onehalfdark
+let g:airline_theme='onehalfdark'
 hi LineNr ctermfg=Magenta
 
 " Make VIM use the gnome clipboard for yanks and pastes
@@ -75,6 +79,8 @@ while c <= 'z'
 endw
 
 set timeout ttimeoutlen=25
+
+let g:c_no_curly_error=1
 
 " ----- airline settings -----
 set laststatus=2 " Use airline when one file is open
@@ -208,4 +214,3 @@ autocmd FileType c,cpp,objc map <buffer><Leader>x <Plug>(operator-clang-format)
 " Toggle auto formatting:
 nmap <Leader>C :ClangFormatAutoToggle<CR>
 autocmd FileType c ClangFormatAutoEnable
-

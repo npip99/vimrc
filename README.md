@@ -6,6 +6,7 @@ This repository contains my default vim configuration. It contains configuration
 - Yanks and pastes will now be synced with the same clipboard used across the rest of your programs.
 - `<C+h>` will move the cursor to the next left-most window, and ditto for `j`, `k`, and `l`.
 - While in the directory listing on the left-hand side, `<S+c>` will move the current working directory to whatever directory you're hovering over.
+- While in the directory listing, `<S+i>` will toggle the visibility of hidden files.
 - There are several automatic optimizations when it comes to using open-close-type characters `{`, `[`, `(`, `'`, `"`, etc. If you want to simply type a character like `{` without those optimizations, type `<C+v>{` while in insert mode. The same will work for any of the other optimized open-close characters.
 - If you want to wrap parenthesis around a long word like `this_is_a_long_variable`, then type `(<A+e>` while your cursor is blinking over the initial letter `t`. The same applies to all of the other open-close characters.
 - Vim will check for compiler errors everytime you save a `.cpp` file with `:w`. You can add the configuration file `.syntastic_cpp_config` with all of the compiler arguments you would like to use when compiling a `.cpp` file in that directory. An example would be `-I.\n-std=c++17`, for including header files in the root directory `.` and compiling with `C++17`.

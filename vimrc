@@ -41,6 +41,8 @@ filetype plugin indent on    " required
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
 
+" ----- general settings -----
+
 map <C-j> <C-W>j
 map <C-k> <C-W>k
 map <C-h> <C-W>h
@@ -49,6 +51,7 @@ map <C-l> <C-W>l
 set backspace=indent,eol,start
 set ruler
 set number
+set relativenumber
 set showcmd
 set incsearch
 set hlsearch
@@ -57,6 +60,21 @@ syntax on
 
 colorscheme wombat
 hi LineNr ctermfg=Magenta
+
+" Make VIM use the gnome clipboard for yanks and pastes
+set clipboard=unnamedplus
+
+" Map escape-A to alt-A, to fix issue where alt is sent using escape. If
+" there is a 25 ms gap, vim presumes you meant to first press escape, and then
+" A.
+let c='a'
+while c <= 'z'
+  exec "set <A-".c.">=\e".c
+  exec "imap \e".c." <A-".c.">"
+  let c = nr2char(1+char2nr(c))
+endw
+
+set timeout ttimeoutlen=25
 
 " ----- airline settings -----
 set laststatus=2 " Use airline when one file is open
@@ -191,17 +209,3 @@ autocmd FileType c,cpp,objc map <buffer><Leader>x <Plug>(operator-clang-format)
 nmap <Leader>C :ClangFormatAutoToggle<CR>
 autocmd FileType c ClangFormatAutoEnable
 
-" Make VIM use the gnome clipboard for yanks and pastes
-set clipboard=unnamedplus
-
-" Map escape-A to alt-A, to fix issue where alt is sent using escape. If
-" there is a 25 ms gap, vim presumes you meant to first press escape, and then
-" A.
-let c='a'
-while c <= 'z'
-  exec "set <A-".c.">=\e".c
-  exec "imap \e".c." <A-".c.">"
-  let c = nr2char(1+char2nr(c))
-endw
-
-set timeout ttimeoutlen=25

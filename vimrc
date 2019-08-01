@@ -9,7 +9,6 @@ call vundle#begin()
 
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
-
 Plugin 'ntpeters/vim-better-whitespace'
 Plugin 'Shougo/neocomplete.vim'
 Plugin 'vim-airline/vim-airline-themes'
@@ -25,6 +24,7 @@ Plugin 'majutsushi/tagbar'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'jiangmiao/auto-pairs'
 Plugin 'rhysd/vim-clang-format'
+Plugin 'tpope/vim-sleuth'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -65,11 +65,12 @@ set laststatus=2 " Use airline when one file is open
 " Open/close NERDTree Tabs with \t
 nmap <silent> <leader>t :NERDTreeTabsToggle<CR>
 " To have NERDTree always open on startup
-let g:nerdtree_tabs_open_on_console_startup = 0
+let g:nerdtree_tabs_open_on_console_startup = 1
 
 " ----- scrooloose/syntastic settings -----
 let g:syntastic_error_symbol = "X"
 let g:syntastic_warning_symbol = "-"
+let g:syntastic_cpp_config_file = ".syntastic_cpp_config"
 augroup mySyntastic
   au!
   au FileType tex let b:syntastic_mode = "passive"
@@ -172,13 +173,14 @@ hi Pmenu ctermbg=Grey
 
 " ----- auto-pairs settings -----
 let g:AutoPairsMapSpace = 0
+let g:AutoPairsMultilineClose = 0
 
 " ----- clang-format settings -----
 let g:clang_format#style_options = {
             \ "AccessModifierOffset" : -4,
             \ "AllowShortIfStatementsOnASingleLine" : "true",
             \ "AlwaysBreakTemplateDeclarations" : "true",
-            \ "Standard" : "C++11"}
+            \ "Standard" : "C++17"}
 
 " map to <Leader>cf in C++ code
 autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
@@ -188,3 +190,18 @@ autocmd FileType c,cpp,objc map <buffer><Leader>x <Plug>(operator-clang-format)
 " Toggle auto formatting:
 nmap <Leader>C :ClangFormatAutoToggle<CR>
 autocmd FileType c ClangFormatAutoEnable
+
+" Make VIM use the gnome clipboard for yanks and pastes
+set clipboard=unnamedplus
+
+" Map escape-A to alt-A, to fix issue where alt is sent using escape. If
+" there is a 25 ms gap, vim presumes you meant to first press escape, and then
+" A.
+let c='a'
+while c <= 'z'
+  exec "set <A-".c.">=\e".c
+  exec "imap \e".c." <A-".c.">"
+  let c = nr2char(1+char2nr(c))
+endw
+
+set timeout ttimeoutlen=25

@@ -33,3 +33,4 @@ brew install luajit
 brew install vim --with-luajit
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 vim +PluginInstall +qall
+sudo apt install vim-gnome

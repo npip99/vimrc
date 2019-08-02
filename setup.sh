@@ -42,6 +42,12 @@ git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 vim +PluginInstall +qall
 sudo apt install vim-gnome
 
+echo >> ~/.bashrc
+echo '# Set vim as the default editor' >> ~/.bashrc
+echo 'export VISUAL=vim' >> ~/.bashrc
+echo 'export EDITOR="$VISUAL"' >> ~/.bashrc
+echo >> ~/.bashrc
+
 read -p "Do you want to remap CAPS LOCK to CTRL? (y/n) " -r
 if [[ $REPLY =~ ^[Yy]$ ]]
 then

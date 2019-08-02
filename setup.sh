@@ -15,8 +15,8 @@ sudo apt-get install openjdk-7-jdk
 
 # Update GCC
 sudo apt-get install g++-6
-sudo rm /usr/bin/g++                                                                                                              
-sudo ln -s /usr/bin/g++-6 /usr/bin/g++      
+sudo rm /usr/bin/g++
+sudo ln -s /usr/bin/g++-6 /usr/bin/g++
 sudo rm /usr/bin/gcc
 sudo ln -s /usr/bin/gcc-6 /usr/bin/gcc
 
@@ -42,11 +42,13 @@ git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 vim +PluginInstall +qall
 sudo apt install vim-gnome
 
-echo >> ~/.bashrc
-echo '# Set vim as the default editor' >> ~/.bashrc
-echo 'export VISUAL=vim' >> ~/.bashrc
-echo 'export EDITOR="$VISUAL"' >> ~/.bashrc
-echo >> ~/.bashrc
+if ! cat ~/.bashrc | grep "export VISUAL=vim" > /dev/null; then
+  echo >> ~/.bashrc
+  echo '# Set vim as the default editor' >> ~/.bashrc
+  echo 'export VISUAL=vim' >> ~/.bashrc
+  echo 'export EDITOR="$VISUAL"' >> ~/.bashrc
+  echo >> ~/.bashrc
+fi
 
 read -p "Do you want to remap CAPS LOCK to CTRL? (y/n) " -r
 if [[ $REPLY =~ ^[Yy]$ ]]

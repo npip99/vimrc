@@ -34,3 +34,13 @@ brew install vim --with-luajit
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 vim +PluginInstall +qall
 sudo apt install vim-gnome
+
+read -p "Do you want to remap CAPS LOCK to CTRL? (y/n) " -r
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+  echo Executing \"setxkbmap -option ctrl:nocaps\"
+  setxkbmap -option ctrl:nocaps
+else
+  echo In the future, you can do this with \"setxkbmap -option ctrl:nocaps\"
+fi
+echo Deactiving can be done with \"setxkbmap -option\"

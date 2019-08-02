@@ -1,4 +1,11 @@
-#!/bin/sh
+#!/bin/bash
+
+read -p "This script is only prepared to run on Ubuntu. Do you want to continue? (y/n) " -r
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+  echo "Feel free to edit this script file as desired. If you rewrite it for your own operating system and it works, do let me know so I can add your script to this repository. Thanks!"
+  exit
+fi
 
 # Update apt-get
 sudo apt-get update

@@ -34,8 +34,7 @@ if ! cat ~/.bashrc | grep "linuxbrew" > /dev/null; then
   echo >> ~/.bashrc
 fi
 . ~/.bashrc
-brew install luajit
-brew install vim --with-luajit
+brew install vim
 
 # Setup Vim Plugins
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim

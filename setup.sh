@@ -11,33 +11,25 @@ then
 fi
 
 # Update apt-get
-sudo apt update
+sudo apt update -y
 
 # Update GCC
-sudo apt install g++-7
+sudo apt install g++-7 -y
 sudo rm /usr/bin/g++
 sudo ln -s /usr/bin/g++-7 /usr/bin/g++
 sudo rm /usr/bin/gcc
 sudo ln -s /usr/bin/gcc-7 /usr/bin/gcc
 
 # Install clang-format
-sudo apt install clang-format
+sudo apt install clang-format -y
 
 # Install Vim
-git clone https://github.com/Linuxbrew/brew.git ~/.linuxbrew
-if ! cat ~/.bashrc | grep "linuxbrew" > /dev/null; then
-  echo >> ~/.bashrc
-  echo '# Add LinuxBrew to path' >> ~/.bashrc
-  echo 'export PATH="$HOME/.linuxbrew/bin:$PATH"' >> ~/.bashrc
-  echo 'export MANPATH="$(brew --prefix)/share/man:$MANPATH"' >> ~/.bashrc
-  echo 'export INFOPATH="$(brew --prefix)/share/info:$INFOPATH"' >> ~/.bashrc
-  echo >> ~/.bashrc
-fi
-. ~/.bashrc
-brew install vim
+sudo apt install vim-gtk3 -y
 
 # Setup Vim Plugins
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+mv ~/.vimrc ~/.oldvimrc
+cp vimrc ~/.vimrc
 vim +PluginInstall +qall
 
 # Setup bashrc

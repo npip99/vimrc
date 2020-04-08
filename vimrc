@@ -200,11 +200,8 @@ let g:AutoPairsMapSpace = 0
 let g:AutoPairsMultilineClose = 0
 
 " ----- clang-format settings -----
-let g:clang_format#style_options = {
-            \ "AccessModifierOffset" : -4,
-            \ "AllowShortIfStatementsOnASingleLine" : "true",
-            \ "AlwaysBreakTemplateDeclarations" : "true",
-            \ "Standard" : "C++17"}
+"
+let g:clang_format#style_options = {"Standard" : "Auto"}
 
 " map to <Leader>cf in C++ code
 autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>

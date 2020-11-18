@@ -20,6 +20,9 @@ sudo ln -s /usr/bin/g++-7 /usr/bin/g++
 sudo rm /usr/bin/gcc
 sudo ln -s /usr/bin/gcc-7 /usr/bin/gcc
 
+# Install nodejs
+sudo apt install nodejs -y
+
 # Install clang-format
 sudo apt install clang-format -y
 

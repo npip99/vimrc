@@ -27,6 +27,8 @@ Plugin 'rhysd/vim-clang-format'
 Plugin 'tpope/vim-sleuth'
 Plugin 'octol/vim-cpp-enhanced-highlight'
 Plugin 'sonph/onehalf', {'rtp': 'vim/'}
+Plugin 'leafgarland/typescript-vim'
+Plugin 'peitalin/vim-jsx-typescript'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required

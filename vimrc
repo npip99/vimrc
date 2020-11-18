@@ -27,8 +27,12 @@ Plugin 'rhysd/vim-clang-format'
 Plugin 'tpope/vim-sleuth'
 Plugin 'octol/vim-cpp-enhanced-highlight'
 Plugin 'sonph/onehalf', {'rtp': 'vim/'}
+Plugin 'pangloss/vim-javascript'
 Plugin 'leafgarland/typescript-vim'
 Plugin 'peitalin/vim-jsx-typescript'
+Plugin 'styled-components/vim-styled-components', { 'branch': 'main' }
+Plugin 'jparise/vim-graphql'
+Plugin 'neoclide/coc.nvim', {'branch': 'release'}
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -83,6 +87,12 @@ endw
 set timeout ttimeoutlen=25
 
 let g:c_no_curly_error=1
+
+" ----- coc settings -----
+let g:coc_global_extensions = [
+  \ 'coc-tsserver'
+  \ ]
+let g:coc_disable_startup_warning = 1
 
 " ----- airline settings -----
 set laststatus=2 " Use airline when one file is open

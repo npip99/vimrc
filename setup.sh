@@ -13,12 +13,8 @@ fi
 # Update apt-get
 sudo apt update -y
 
-# Update GCC
-sudo apt install g++-7 -y
-sudo rm /usr/bin/g++
-sudo ln -s /usr/bin/g++-7 /usr/bin/g++
-sudo rm /usr/bin/gcc
-sudo ln -s /usr/bin/gcc-7 /usr/bin/gcc
+# Install clss
+sudo snap install ccls --classic
 
 # Install nodejs
 sudo apt install nodejs -y
@@ -33,7 +29,11 @@ sudo apt install vim-gtk3 -y
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 mv ~/.vimrc ~/.oldvimrc
 cp vimrc ~/.vimrc
+vim +PluginClean +qall
 vim +PluginInstall +qall
+
+# Copy coc-settings.json
+cp coc-settings.json ~/.vim
 
 # Setup bashrc
 if ! cat ~/.bashrc | grep "Set vim as the default editor" > /dev/null; then

@@ -32,6 +32,7 @@ Plugin 'peitalin/vim-jsx-typescript'
 Plugin 'styled-components/vim-styled-components', { 'branch': 'main' }
 Plugin 'jparise/vim-graphql'
 Plugin 'neoclide/coc.nvim', {'branch': 'release'}
+Plugin 'npip99/vim-voxelscript'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -89,7 +90,9 @@ let g:c_no_curly_error=1
 
 " ----- coc settings -----
 let g:coc_global_extensions = [
-  \ 'coc-tsserver'
+  \ 'coc-tsserver',
+  \ 'coc-html',
+  \ 'coc-css'
   \ ]
 let g:coc_disable_startup_warning = 1
 

@@ -7,12 +7,21 @@
       "rootPatterns": [".ccls", "compile_commands.json"],
       "initializationOptions": {
          "cache": {
-           "directory": "/tmp/ccls"
+           "directory": "/tmp/vim-ccls"
          },
          "client": {
           "snippetSupport": true
          }
        }
+    },
+    "voxells": {
+      "command": "voxells",
+      "args": [],
+      "filetypes": ["VoxelScript"],
+      "rootPatterns": ["vspackage.json"],
+      "initializationOptions": {
+        "client": {}
+      }
     }
   }
 }

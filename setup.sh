@@ -3,9 +3,8 @@
 # Prompt user about this script
 read -p "This script is only prepared to run on Ubuntu. Do you want to continue? (y/n) " -r
 echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]
-then
-  echo "Feel free to edit this script file as desired to make it work on your setup. If you rewrite it for your own operating system and it works, do let me know so I can add your script to this repository. Thanks!"
+if [[ ! "$REPLY" =~ ^[Yy](es)?$ ]]; then
+  echo "Feel free to edit this script file as desired to make it work on your distro. If you rewrite it for your own operating system / distro and it works, do let me know so I can add your script to this repository. Thanks!"
   echo
   exit
 fi
@@ -27,10 +26,12 @@ sudo apt install vim-gtk3 -y
 
 # Setup Vim Plugins
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-mv ~/.vimrc ~/.oldvimrc
+if [[ -f ~/.vimrc ]]; then
+  mv ~/.vimrc ~/.vimrc.bak
+fi
 cp vimrc ~/.vimrc
-vim +PluginClean +qall
-vim +PluginInstall +qall
+vim -s +PluginClean +qall
+vim -s +PluginInstall +qall
 
 # Copy coc-settings.json
 cp coc-settings.json ~/.vim
@@ -48,8 +49,7 @@ fi
 echo
 read -p "Do you want to remap CAPS LOCK to CTRL? (y/n) " -r
 echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
+if [[ "$REPLY" =~ ^[Yy](es)?$ ]]; then
   echo Executing \"setxkbmap -option ctrl:nocaps ...\"
   setxkbmap -option ctrl:nocaps
   echo Adding \"setxkbmap -option ctrl:nocaps\" to ~/.profile ...
@@ -68,3 +68,14 @@ echo Deactivating can be done by typing \"setxkbmap -option\"
 echo Deactivating can be done permanently by editing \"~/.profile\"
 echo
 
+echo
+read -p "Do you want to install this vimrc into the root user as well? (y/n) " -r
+echo
+if [[ "$REPLY" =~ ^[Yy](es)?$ ]]; then
+  sudo rm -r /root/.vim
+  sudo rm /root/.vimrc
+  sudo cp -r "$HOME/.vim" /root/.vim
+  sudo cp "$HOME/.vimrc" /root/.vimrc
+fi
+echo "Done!"
+echo

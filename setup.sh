@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Setup error handling
+set -e
+trap 'echo "Error on line $LINENO!"' ERR
+
 # Prompt user about this script
 read -p "This script is only prepared to run on Ubuntu. Do you want to continue? (y/n) " -r
 echo
@@ -13,7 +17,7 @@ fi
 sudo apt update -y
 
 # Install clss
-sudo snap install ccls --classic
+sudo apt install ccls -y
 
 # Install nodejs
 sudo apt install nodejs -y
@@ -30,8 +34,7 @@ if [[ -f ~/.vimrc ]]; then
   mv ~/.vimrc ~/.vimrc.bak
 fi
 cp vimrc ~/.vimrc
-vim -s +PluginClean +qall
-vim -s +PluginInstall +qall
+echo "\n" | vim +PluginInstall +qall
 
 # Copy coc-settings.json
 cp coc-settings.json ~/.vim

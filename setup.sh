@@ -14,19 +14,13 @@ if [[ ! "$REPLY" =~ ^[Yy](es)?$ ]]; then
 fi
 
 # Update apt-get
-sudo apt update -y
+sudo apt-get update -y
 
-# Install clss
-sudo apt install ccls -y
-
-# Install nodejs
-sudo apt install nodejs -y
-
-# Install clang-format
-sudo apt install clang-format -y
-
-# Install Vim
-sudo apt install vim-gtk3 -y
+# Install dependencies
+pkgs='ccls nodejs clang-format vim-gtk3'
+if ! dpkg -s $pkgs >/dev/null 2>&1; then
+  sudo apt-get install $pkgs -y
+fi
 
 # Setup Vim Plugins
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim

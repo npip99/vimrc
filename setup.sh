@@ -75,8 +75,8 @@ echo
 read -p "Do you want to install this vimrc into the root user as well? (y/n) " -r
 echo
 if [[ "$REPLY" =~ ^[Yy](es)?$ ]]; then
-  sudo rm -r /root/.vim
-  sudo rm /root/.vimrc
+  sudo rm -rf /root/.vim
+  sudo rm -f /root/.vimrc
   sudo cp -r "$HOME/.vim" /root/.vim
   sudo cp "$HOME/.vimrc" /root/.vimrc
 fi

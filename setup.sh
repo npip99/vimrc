@@ -5,12 +5,27 @@ set -e
 trap 'echo "Error on line $LINENO!"' ERR
 
 # Prompt user about this script
+echo
 read -p "This script is only prepared to run on Ubuntu. Do you want to continue? (y/n) " -r
 echo
 if [[ ! "$REPLY" =~ ^[Yy](es)?$ ]]; then
   echo "Feel free to edit this script file as desired to make it work on your distro. If you rewrite it for your own operating system / distro and it works, do let me know so I can add your script to this repository. Thanks!"
   echo
   exit
+fi
+
+# Check for existant ~/.vim or ~/.vimrc
+if [[ -d ~/.vim || -f ~/.vimrc ]]; then
+  read -p "An existant ~/.vim or ~/.vimrc has been found. Overwrite all contents? (y/n) " -r
+  echo
+  if [[ "$REPLY" =~ ^[Yy](es)?$ ]]; then
+    rm -rf ~/.vim
+    rm -f ~/.vimrc
+  else
+    echo "Cannot continue unless ~/.vim and ~/.vimrc no longer exist"
+    echo
+    exit 1
+  fi
 fi
 
 # Update apt-get
@@ -24,9 +39,6 @@ fi
 
 # Setup Vim Plugins
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-if [[ -f ~/.vimrc ]]; then
-  mv ~/.vimrc ~/.vimrc.bak
-fi
 cp vimrc ~/.vimrc
 echo "\n" | vim +PluginInstall +qall
 

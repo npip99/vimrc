@@ -72,7 +72,7 @@ let g:airline_theme='onehalfdark'
 hi LineNr ctermfg=Magenta
 
 " Make VIM use the gnome clipboard for yanks and pastes
-set clipboard=unnamedplus
+set clipboard=unnamed
 
 " Map escape-A to alt-A, to fix issue where alt is sent using escape. If
 " there is a 25 ms gap, vim presumes you meant to first press escape, and then

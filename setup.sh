@@ -81,14 +81,18 @@ if [[ ! "$OSTYPE" =~ ^darwin ]]; then
   echo
   maybe_read "Do you want to remap CAPS LOCK to CTRL? (y/n) "
   if [[ "$REPLY" =~ ^[Yy](es)?$ ]]; then
-    echo Executing \"setxkbmap -option ctrl:nocaps ...\"
-    setxkbmap -option ctrl:nocaps
-    echo Adding \"setxkbmap -option ctrl:nocaps\" to ~/.profile ...
-    if ! cat ~/.profile | grep "Remap CAPS LOCK to CTRL" > /dev/null; then
-      echo >> ~/.profile
-      echo '# Remap CAPS LOCK to CTRL' >> ~/.profile
-      echo 'setxkbmap -option ctrl:nocaps' >> ~/.profile
-      echo >> ~/.profile
+    if ! which setxkbmap; then
+      echo "Note: Could not find command \"setxkbmap\", will not remap CAPS LOCK to CTRL."
+    else
+      echo Executing \"setxkbmap -option ctrl:nocaps ...\"
+      setxkbmap -option ctrl:nocaps
+      echo Adding \"setxkbmap -option ctrl:nocaps\" to ~/.profile ...
+      if ! cat ~/.profile | grep "Remap CAPS LOCK to CTRL" > /dev/null; then
+        echo >> ~/.profile
+        echo '# Remap CAPS LOCK to CTRL' >> ~/.profile
+        echo 'setxkbmap -option ctrl:nocaps' >> ~/.profile
+        echo >> ~/.profile
+      fi
     fi
   else
     echo In the future, you can do this with \"setxkbmap -option ctrl:nocaps\"

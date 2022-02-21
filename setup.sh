@@ -2,12 +2,26 @@
 
 # Setup error handling
 set -e
-trap 'echo "Error on line $LINENO!"' ERR
+trap 'echo "Error at $BASH_SOURCE on line $LINENO!"' ERR
+
+ALWAYS_YES=
+if [[ "$1" == "-y" ]]; then
+  ALWAYS_YES="y"
+fi
+
+maybe_read () {
+  if [[ ! -z "$ALWAYS_YES" ]]; then
+    echo "$1 y"
+    export REPLY="y"
+  else
+    read -p "$1" -r
+    echo
+  fi
+}
 
 # Prompt user about this script
 echo
-read -p "This script is only prepared to run on Ubuntu or Mac OSX. Do you want to continue? (y/n) " -r
-echo
+maybe_read "This script is only prepared to run on Ubuntu or Mac OSX. Do you want to continue? (y/n) "
 if [[ ! "$REPLY" =~ ^[Yy](es)?$ ]]; then
   echo "Feel free to edit this script file as desired to make it work on your OS/distro. If you rewrite it for your own operating system / distro and it works, do let me know so I can add your script to this repository. Thanks!"
   echo
@@ -16,8 +30,7 @@ fi
 
 # Check for existant ~/.vim or ~/.vimrc
 if [[ -d ~/.vim || -f ~/.vimrc ]]; then
-  read -p "An existant ~/.vim or ~/.vimrc has been found. Overwrite all contents? (y/n) " -r
-  echo
+  maybe_read "An existant ~/.vim or ~/.vimrc has been found. Overwrite all contents? (y/n) "
   if [[ "$REPLY" =~ ^[Yy](es)?$ ]]; then
     rm -rf ~/.vim
     rm -f ~/.vimrc
@@ -66,8 +79,7 @@ fi
 if [[ ! "$OSTYPE" =~ ^darwin ]]; then
   # Prompt for caps lock to ctrl remap
   echo
-  read -p "Do you want to remap CAPS LOCK to CTRL? (y/n) " -r
-  echo
+  maybe_read "Do you want to remap CAPS LOCK to CTRL? (y/n) "
   if [[ "$REPLY" =~ ^[Yy](es)?$ ]]; then
     echo Executing \"setxkbmap -option ctrl:nocaps ...\"
     setxkbmap -option ctrl:nocaps
@@ -90,8 +102,7 @@ if [[ ! "$OSTYPE" =~ ^darwin ]]; then
   # Install vim into root user
   # On Mac, the root user is /home/$USER
   echo
-  read -p "Do you want to install this vimrc into the root user as well? (y/n) " -r
-  echo
+  maybe_read "Do you want to install this vimrc into the root user as well? (y/n) "
   if [[ "$REPLY" =~ ^[Yy](es)?$ ]]; then
     sudo rm -rf /root/.vim
     sudo rm -f /root/.vimrc

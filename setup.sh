@@ -60,6 +60,10 @@ echo "\n" | vim +PluginInstall +qall
 # Copy coc-settings.json
 cp coc-settings.json ~/.vim
 
+# Checkout release version of coc
+cd ~/.vim/bundle/coc.nvim
+git checkout release
+
 # Find bashrc path based on OS
 if [[ "$OSTYPE" =~ ^darwin ]]; then
   BASH_RC="$HOME/.profile"

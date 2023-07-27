@@ -43,13 +43,20 @@ fi
 
 # Install dependencies
 if [[ "$OSTYPE" =~ ^darwin ]]; then
-  brew install ccls nodejs clang-format vim
+  brew install ccls node clang-format vim
 else
+  # Install any Apt Pre-requisites
   sudo apt-get update -y
-  pkgs='ccls nodejs clang-format vim-gtk3'
+  pkgs='ccls clang-format vim-gtk3'
   if ! dpkg -s $pkgs >/dev/null 2>&1; then
     sudo apt-get install $pkgs -y
   fi
+  # Install NVM
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.4/install.sh | bash
+  source ~/.nvm/nvm.sh
+  # Install NodeJS and NPM
+  nvm install 18.17.0
+  nvm use 18.17.0
 fi
 
 # Setup Vim Plugins

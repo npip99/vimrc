@@ -47,7 +47,7 @@ if [[ "$OSTYPE" =~ ^darwin ]]; then
 else
   # Install any Apt Pre-requisites
   sudo apt-get update -y
-  pkgs='ccls clang-format vim-gtk3'
+  pkgs='curl ccls clang-format vim-gtk3'
   if ! dpkg -s $pkgs >/dev/null 2>&1; then
     sudo apt-get install $pkgs -y
   fi
@@ -69,6 +69,8 @@ cp coc-settings.json ~/.vim
 
 # Checkout release version of coc
 cd ~/.vim/bundle/coc.nvim
+git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+git fetch --depth=1 origin release
 git checkout release
 
 # Find bashrc path based on OS
@@ -127,4 +129,5 @@ if [[ ! "$OSTYPE" =~ ^darwin ]]; then
 fi
 
 echo "Done!"
+echo "Please restart your terminal or run 'exec bash' to update your PATH"
 echo

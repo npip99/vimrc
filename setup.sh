@@ -119,12 +119,17 @@ if [[ ! "$OSTYPE" =~ ^darwin ]]; then
   # Install vim into root user
   # On Mac, the root user is /home/$USER
   echo
-  maybe_read "Do you want to install this vimrc into the root user as well? (y/n) "
-  if [[ "$REPLY" =~ ^[Yy](es)?$ ]]; then
-    sudo rm -rf /root/.vim
-    sudo rm -f /root/.vimrc
-    sudo cp -r "$HOME/.vim" /root/.vim
-    sudo cp "$HOME/.vimrc" /root/.vimrc
+  ROOT_HOME=/root
+  if [[ "$HOME" -ef "$ROOT_HOME" ]]; then
+    echo "Installed this vimrc into root!"
+  else
+    maybe_read "Do you want to install this vimrc into the root user as well? (y/n) "
+    if [[ "$REPLY" =~ ^[Yy](es)?$ ]]; then
+      sudo rm -rf "$ROOT_HOME/.vim"
+      sudo rm -f "$ROOT_HOME/.vimrc"
+      sudo cp -r "$HOME/.vim" "$ROOT_HOME/.vim"
+      sudo cp "$HOME/.vimrc" "$ROOT_HOME/.vimrc"
+    fi
   fi
 fi
 

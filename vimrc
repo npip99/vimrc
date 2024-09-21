@@ -33,10 +33,15 @@ Plugin 'styled-components/vim-styled-components', { 'branch': 'main' }
 Plugin 'jparise/vim-graphql'
 Plugin 'neoclide/coc.nvim', {'branch': 'release'}
 Plugin 'npip99/vim-voxelscript'
+Plugin 'junegunn/fzf' " Must install fzf through plugin or PATH
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
+let g:python_indent = {}
+let g:python_indent.open_paren = 'shiftwidth()'
+let g:python_indent.closed_paren_align_last_line = v:false
+
 " To ignore plugin indent changes, instead use:
 "filetype plugin on
 "
@@ -51,10 +56,17 @@ filetype plugin indent on    " required
 
 " ----- general settings -----
 
+map <Space> <Leader>
+
+" Faster window movement with CTRL+direction
 map <C-j> <C-W>j
 map <C-k> <C-W>k
 map <C-h> <C-W>h
 map <C-l> <C-W>l
+
+" Alt-j/k inserts an empty line above/below the current line, without moving the cursor.
+nnoremap <silent><A-j> :set paste<CR>m`o<Esc>``:set nopaste<CR>
+nnoremap <silent><A-k> :set paste<CR>m`O<Esc>``:set nopaste<CR>
 
 set backspace=indent,eol,start
 set ruler
@@ -65,11 +77,56 @@ set incsearch
 set hlsearch
 set cursorline
 
+" ----- fzf settings -----
+
+nnoremap <Leader>ff :FZF<CR>
+" Use <C-j> / <C-k> to navigate fzf window
+let $FZF_DEFAULT_OPTS = '--bind "ctrl-j:down,ctrl-k:up,alt-j:preview-down,alt-k:preview-up"'
+
+" ----- syntax highlighter settings -----
 syntax enable
+
+" multi-line case in python
+autocmd FileType python syn match pythonConditional "^\s*\zscase\%(\s\+.*(.*$\)\@="
 
 colorscheme onehalfdark
 let g:airline_theme='onehalfdark'
-hi LineNr ctermfg=Magenta
+
+" "hi!" vs "hi" https://stackoverflow.com/a/31146436
+hi CursorLineNr ctermfg=139 ctermbg=237
+hi LineNr ctermfg=139
+hi Comment ctermfg=71
+hi String ctermfg=180
+hi! link Number String
+hi Identifier ctermfg=117
+hi Special ctermfg=168
+hi Function ctermfg=229
+hi Constant ctermfg=39
+hi Escape ctermfg=208
+hi Type ctermfg=43
+hi! link Keyword Statement
+
+hi! link pythonEscape Escape
+hi! link vimEscape Escape
+hi! link PreProc Identifier
+hi! link PreCondit Identifier
+hi! link pythonBuiltin Constant
+
+" Show syntax group stack
+function! Syn ()
+  echo 'Highlight group: ' . synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name') . "\n" . 'ctermfg: ' . synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'fg#') . "\n" . 'guifg: ' . synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'fg#')
+endfunction
+function! SynStack ()
+    for i1 in synstack(line("."), col("."))
+        let i2 = synIDtrans(i1)
+        let n1 = synIDattr(i1, "name")
+        let n2 = synIDattr(i2, "name")
+        echo n1 "->" n2
+    endfor
+endfunction
+" `:call SynStack()` to see syntax highlight group stacktrace
+" :CocCommand semanticTokens.checkCurrent
+" :so $VIMRUNTIME/syntax/hitest.vim
 
 " Make VIM use the gnome clipboard for yanks and pastes
 set clipboard=unnamed
@@ -92,9 +149,15 @@ let g:c_no_curly_error=1
 let g:coc_global_extensions = [
   \ 'coc-tsserver',
   \ 'coc-html',
-  \ 'coc-css'
+  \ 'coc-css',
+  \ 'coc-basedpyright'
   \ ]
-let g:coc_disable_startup_warning = 1
+hi CocInlayHint term=bold cterm=italic ctermfg=245 gui=italic
+hi! link CocSemTypeDecorator Function
+hi! link CocSemTypeTypeParameter Type " Type created with `from typing import TypeVar`
+hi! link CocSemTypeClass Type
+hi! link CocSemNamespace Type
+hi! link CocSemTypeNamespace CocSemNamespace
 
 " TextEdit might fail if hidden is not set.
 set hidden
@@ -110,14 +173,8 @@ set nowritebackup
 " delays and poor user experience.
 set updatetime=300
 
-" Always show the signcolumn, otherwise it would shift the text each time
-" diagnostics appear/become resolved.
-if has("patch-8.1.1564")
-  " Recently vim can merge signcolumn and number column into one
-  set signcolumn=number
-else
-  set signcolumn=yes
-endif
+" Show 2 signcolumns, for diagnostics/gitgutter + lineno
+set signcolumn = "yes:2"
 
 " Use tab for trigger completion with characters ahead and navigate.
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
@@ -187,11 +244,11 @@ augroup end
 
 " Applying codeAction to the selected region.
 " Example: `<leader>aap` for current paragraph
-xmap <leader>a  <Plug>(coc-codeaction-selected)
-nmap <leader>a  <Plug>(coc-codeaction-selected)
+xmap <leader>a  <Plug>(coc-codeaction-selection)
+nmap <leader>a  <Plug>(coc-codeaction-cursor)
 
 " Remap keys for applying codeAction to the current buffer.
-nmap <leader>ac  <Plug>(coc-codeaction)
+" nmap <leader>ac  <Plug>(coc-codeaction)
 " Apply AutoFix to problem on the current line.
 nmap <leader>qf  <Plug>(coc-fix-current)
 
@@ -240,21 +297,21 @@ command! -nargs=0 OR   :call     CocActionAsync('runCommand', 'editor.action.org
 
 " Mappings for CoCList
 " Show all diagnostics.
-nnoremap <silent><nowait> <space>a  :<C-u>CocList diagnostics<cr>
+nnoremap <silent><nowait> <leader>d  :<C-u>CocList diagnostics<cr>
 " Manage extensions.
-nnoremap <silent><nowait> <space>e  :<C-u>CocList extensions<cr>
+nnoremap <silent><nowait> <leader>e  :<C-u>CocList extensions<cr>
 " Show commands.
-nnoremap <silent><nowait> <space>c  :<C-u>CocList commands<cr>
+nnoremap <silent><nowait> <leader>c  :<C-u>CocList commands<cr>
 " Find symbol of current document.
-nnoremap <silent><nowait> <space>o  :<C-u>CocList outline<cr>
+nnoremap <silent><nowait> <leader>o  :<C-u>CocList outline<cr>
 " Search workspace symbols.
-nnoremap <silent><nowait> <space>s  :<C-u>CocList -I symbols<cr>
+nnoremap <silent><nowait> <leader>s  :<C-u>CocList -I symbols<cr>
 " Do default action for next item.
-nnoremap <silent><nowait> <space>j  :<C-u>CocNext<CR>
+nnoremap <silent><nowait> <leader>j  :<C-u>CocNext<CR>
 " Do default action for previous item.
-nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
+nnoremap <silent><nowait> <leader>k  :<C-u>CocPrev<CR>
 " Resume latest coc list.
-nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
+nnoremap <silent><nowait> <leader>p  :<C-u>CocListResume<CR>
 
 " ----- airline settings -----
 set laststatus=2 " Use airline when one file is open
@@ -262,8 +319,12 @@ set laststatus=2 " Use airline when one file is open
 " ----- nerdtree settings -----
 " Open/close NERDTree Tabs with \t
 nmap <silent> <leader>t :NERDTreeTabsToggle<CR>
-" To have NERDTree always open on startup
-let g:nerdtree_tabs_open_on_console_startup = 1
+" Start NERDTree
+autocmd VimEnter * NERDTree
+" Jump to the main window.
+autocmd VimEnter * wincmd p
+" Highlights
+hi! link NERDTreeHelp Comment
 
 " ----- scrooloose/syntastic settings -----
 let g:syntastic_error_symbol = "X"

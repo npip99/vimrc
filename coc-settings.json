@@ -1,6 +1,8 @@
 {
   "suggest.enablePreselect": false,
   "suggest.noselect": true,
+  "semanticTokens.filetypes": ["*"],
+  "diagnostic.showUnused": false,
   "languageserver": {
     "ccls": {
       "command": "ccls",

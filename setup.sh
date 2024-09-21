@@ -62,7 +62,8 @@ fi
 # Setup Vim Plugins
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 cp vimrc ~/.vimrc
-echo "\n" | vim +PluginInstall +qall
+# Install fzf via plugin instead of package manager, because apt's version is too old
+echo "\n" | vim +PluginInstall +':call fzf#install()' +qall
 
 # Copy coc-settings.json
 cp coc-settings.json ~/.vim

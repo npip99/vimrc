@@ -43,11 +43,11 @@ fi
 
 # Install dependencies
 if [[ "$OSTYPE" =~ ^darwin ]]; then
-  brew install ccls node clang-format vim
+  brew install ccls node clang-format vim ripgrep fd
 else
   # Install any Apt Pre-requisites
   sudo apt-get update -y
-  pkgs='curl ccls clang-format vim-gtk3'
+  pkgs='curl ccls clang-format vim-gtk3 ripgrep fd-find'
   if ! dpkg -s $pkgs >/dev/null 2>&1; then
     sudo apt-get install $pkgs -y
   fi

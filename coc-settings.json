@@ -1,8 +1,30 @@
 {
   "suggest.enablePreselect": false,
   "suggest.noselect": true,
+  "suggest.floatConfig": {
+    "border": true,
+    "rounded": true,
+    "borderhighlight": "CocBorderHighlight"
+  },
+  "hover.floatConfig": {
+    "border": true,
+    "rounded": true,
+    "borderhighlight": "CocBorderHighlight"
+  },
+  "diagnostic.floatConfig": {
+    "border": true,
+    "rounded": true,
+    "borderhighlight": "CocBorderHighlight"
+  },
+  "signature.floatConfig": {
+    "border": true,
+    "rounded": true,
+    "borderhighlight": "CocBorderHighlight"
+  },
+  "dialog.floatBorderHighlight": "CocBorderHighlight",
   "semanticTokens.filetypes": ["*"],
   "diagnostic.showUnused": false,
+  "basedpyright.analysis.typeCheckingMode": "standard",
   "languageserver": {
     "ccls": {
       "command": "ccls",

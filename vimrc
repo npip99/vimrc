@@ -12,7 +12,6 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'ntpeters/vim-better-whitespace'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'flazz/vim-colorschemes'
-Plugin 'kien/ctrlp.vim'
 Plugin 'scrooloose/nerdtree'
 Plugin 'jistr/vim-nerdtree-tabs'
 Plugin 'vim-airline/vim-airline'
@@ -21,8 +20,9 @@ Plugin 'xolox/vim-misc'
 Plugin 'xolox/vim-easytags'
 Plugin 'majutsushi/tagbar'
 Plugin 'airblade/vim-gitgutter'
-Plugin 'jiangmiao/auto-pairs'
+" Plugin 'LunarWatcher/auto-pairs'
 Plugin 'rhysd/vim-clang-format'
+Plugin 'tpope/vim-commentary'
 Plugin 'tpope/vim-sleuth'
 Plugin 'octol/vim-cpp-enhanced-highlight'
 Plugin 'sonph/onehalf', {'rtp': 'vim/'}
@@ -34,6 +34,7 @@ Plugin 'jparise/vim-graphql'
 Plugin 'neoclide/coc.nvim', {'branch': 'release'}
 Plugin 'npip99/vim-voxelscript'
 Plugin 'junegunn/fzf' " Must install fzf through plugin or PATH
+Plugin 'junegunn/fzf.vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -77,14 +78,13 @@ set incsearch
 set hlsearch
 set cursorline
 
-" ----- fzf settings -----
-
-nnoremap <Leader>ff :FZF<CR>
-" Use <C-j> / <C-k> to navigate fzf window
-let $FZF_DEFAULT_OPTS = '--bind "ctrl-j:down,ctrl-k:up,alt-j:preview-down,alt-k:preview-up"'
+" Remove trailing whitespace
+nnoremap <leader>xtrail :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar><CR>
 
 " ----- syntax highlighter settings -----
 syntax enable
+nnoremap <silent> <leader>/ :noh<CR>
+set synmaxcol=16384
 
 " multi-line case in python
 autocmd FileType python syn match pythonConditional "^\s*\zscase\%(\s\+.*(.*$\)\@="
@@ -99,12 +99,14 @@ hi Comment ctermfg=71
 hi String ctermfg=180
 hi! link Number String
 hi Identifier ctermfg=117
+hi IdentifierLight ctermfg=231
 hi Special ctermfg=168
 hi Function ctermfg=229
 hi Constant ctermfg=39
 hi Escape ctermfg=208
 hi Type ctermfg=43
 hi! link Keyword Statement
+hi! link Label Identifier
 
 hi! link pythonEscape Escape
 hi! link vimEscape Escape
@@ -117,12 +119,12 @@ function! Syn ()
   echo 'Highlight group: ' . synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name') . "\n" . 'ctermfg: ' . synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'fg#') . "\n" . 'guifg: ' . synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'fg#')
 endfunction
 function! SynStack ()
-    for i1 in synstack(line("."), col("."))
-        let i2 = synIDtrans(i1)
-        let n1 = synIDattr(i1, "name")
-        let n2 = synIDattr(i2, "name")
-        echo n1 "->" n2
-    endfor
+  for i1 in synstack(line("."), col("."))
+    let i2 = synIDtrans(i1)
+    let n1 = synIDattr(i1, "name")
+    let n2 = synIDattr(i2, "name")
+    echo n1 "->" n2
+  endfor
 endfunction
 " `:call SynStack()` to see syntax highlight group stacktrace
 " :CocCommand semanticTokens.checkCurrent
@@ -142,8 +144,49 @@ while c <= 'z'
 endw
 
 set timeout ttimeoutlen=25
+" set notimeout
 
 let g:c_no_curly_error=1
+
+" ----- fzf settings -----
+
+" Use fd and fd -u
+if executable('fd')
+  let g:fd_binary = 'fd'
+elseif executable('fdfind')
+  let g:fd_binary = 'fdfind'
+else
+  echo "Neither 'fd' nor 'fdfind' was found in PATH"
+endif
+
+let $FZF_DEFAULT_COMMAND = g:fd_binary
+command! -bang -nargs=? -complete=dir FilesAll
+  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'source': g:fd_binary . ' -u'}), <bang>0)
+
+" Use <C-j> / <C-k> to navigate fzf window
+let $FZF_DEFAULT_OPTS = '--bind "ctrl-j:down,ctrl-k:up,alt-j:preview-down,alt-k:preview-up"'
+
+" ripgrep with -uuu (max unrestricted)
+command! -bang -nargs=* RGall
+  \ call fzf#vim#grep2("rg -uuu --column --line-number --no-heading --color=always --smart-case -- ", <q-args>, fzf#vim#with_preview(), <bang>0)
+
+" Keymaps
+nnoremap <leader>ff :RG<CR>
+nnoremap <leader>FF :RGall<CR>
+nnoremap <leader>fb :Buffers<CR>
+" nnoremap <leader>fcl :BLines<CR>
+nnoremap <leader>fl :Lines<CR>
+nnoremap <leader>fgf :GFiles<CR>
+nnoremap <leader>fgc :Commits<CR>
+nnoremap <leader>fm :Marks<CR>
+nnoremap <leader>fkm :Maps<CR>
+nnoremap <leader>fh :History<CR>
+nnoremap <leader>f: :History:<CR>
+nnoremap <leader>f/ :History/<CR>
+nnoremap <leader>fK :Helptags<CR>
+nnoremap <leader>fp :Files<CR>
+nnoremap <leader>FP :FilesAll<CR>
+nmap <C-p> <leader>fp
 
 " ----- coc settings -----
 let g:coc_global_extensions = [
@@ -158,6 +201,10 @@ hi! link CocSemTypeTypeParameter Type " Type created with `from typing import Ty
 hi! link CocSemTypeClass Type
 hi! link CocSemNamespace Type
 hi! link CocSemTypeNamespace CocSemNamespace
+hi! link CocSearch Identifier
+hi! link CocFloating IdentifierLight
+hi CocBorderHighlight ctermfg=240
+hi! link CocVirtualText CocBorderHighlight
 
 " TextEdit might fail if hidden is not set.
 set hidden
@@ -180,9 +227,9 @@ set signcolumn = "yes:2"
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
 " other plugin before putting this into your config.
 inoremap <silent><expr> <TAB>
-      \ coc#pum#visible() ? coc#pum#next(1):
-      \ CheckBackspace() ? "\<Tab>" :
-      \ coc#refresh()
+  \ coc#pum#visible() ? coc#pum#next(1):
+  \ CheckBackspace() ? "\<Tab>" :
+  \ coc#refresh()
 inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
 
 " Make <CR> to accept selected completion item or notify coc.nvim to format
@@ -209,7 +256,7 @@ nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
 " GoTo code navigation.
 nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gt <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
 
@@ -230,9 +277,9 @@ autocmd CursorHold * silent call CocActionAsync('highlight')
 " Symbol renaming.
 nmap <leader>rn <Plug>(coc-rename)
 
-" Formatting selected code.
-xmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
+" Formatting selected code. (af = Action-Format)
+xmap <leader>af  <Plug>(coc-format-selected)
+nmap <leader>af  <Plug>(coc-format-selected)
 
 augroup mygroup
   autocmd!
@@ -301,7 +348,7 @@ nnoremap <silent><nowait> <leader>d  :<C-u>CocList diagnostics<cr>
 " Manage extensions.
 nnoremap <silent><nowait> <leader>e  :<C-u>CocList extensions<cr>
 " Show commands.
-nnoremap <silent><nowait> <leader>c  :<C-u>CocList commands<cr>
+" nnoremap <silent><nowait> <leader>c  :<C-u>CocList commands<cr>
 " Find symbol of current document.
 nnoremap <silent><nowait> <leader>o  :<C-u>CocList outline<cr>
 " Search workspace symbols.
@@ -374,3 +421,9 @@ autocmd FileType c,cpp,objc map <buffer><Leader>x <Plug>(operator-clang-format)
 nmap <Leader>C :ClangFormatAutoToggle<CR>
 autocmd FileType c ClangFormatAutoEnable
 
+" ----- vim-commentary settings -----
+
+xmap <leader>c  <Plug>Commentary
+nmap <leader>c  <Plug>Commentary
+omap <leader>c  <Plug>Commentary
+nmap <leader>cc <Plug>CommentaryLine

@@ -29,13 +29,15 @@ if [[ ! "$REPLY" =~ ^[Yy](es)?$ ]]; then
 fi
 
 # Check for existant ~/.vim or ~/.vimrc
-if [[ -d ~/.vim || -f ~/.vimrc ]]; then
-  maybe_read "An existant ~/.vim or ~/.vimrc has been found. Overwrite all contents? (y/n) "
+if [[ -d ~/.vim || -f ~/.vimrc || -d ~/.tmux || -f ~/.tmux.conf ]]; then
+  maybe_read "An existant ~/.vim, ~/.vimrc, ~/.tmux, or ~/.tmux.conf has been found. Overwrite all contents? (y/n) "
   if [[ "$REPLY" =~ ^[Yy](es)?$ ]]; then
     rm -rf ~/.vim
     rm -f ~/.vimrc
+    rm -rf ~/.tmux
+    rm -f ~/.tmux.conf
   else
-    echo "Cannot continue unless ~/.vim and ~/.vimrc no longer exist"
+    echo "Cannot continue unless ~/.vim, ~/.vimrc, ~/.tmux, and ~/.tmux.conf no longer exist"
     echo
     exit 1
   fi
@@ -43,11 +45,11 @@ fi
 
 # Install dependencies
 if [[ "$OSTYPE" =~ ^darwin ]]; then
-  brew install ccls node clang-format vim ripgrep fd
+  brew install ccls node clang-format vim ripgrep fd tmux
 else
   # Install any Apt Pre-requisites
   sudo apt-get update -y
-  pkgs='curl ccls clang-format vim-gtk3 ripgrep fd-find'
+  pkgs='curl ccls clang-format vim-gtk3 ripgrep fd-find tmux'
   if ! dpkg -s $pkgs >/dev/null 2>&1; then
     sudo apt-get install $pkgs -y
   fi
@@ -58,6 +60,11 @@ else
   nvm install 18.17.0
   nvm use 18.17.0
 fi
+
+# Setup tmux plugins
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+cp tmux.conf ~/.tmux.conf
+~/.tmux/plugins/tpm/bin/install_plugins
 
 # Setup Vim Plugins
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim

@@ -9,6 +9,7 @@ call vundle#begin()
 
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
+Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'ntpeters/vim-better-whitespace'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'flazz/vim-colorschemes'
@@ -69,6 +70,7 @@ map <C-l> <C-W>l
 nnoremap <silent><A-j> :set paste<CR>m`o<Esc>``:set nopaste<CR>
 nnoremap <silent><A-k> :set paste<CR>m`O<Esc>``:set nopaste<CR>
 
+set hidden
 set backspace=indent,eol,start
 set ruler
 set number
@@ -77,6 +79,8 @@ set showcmd
 set incsearch
 set hlsearch
 set cursorline
+set clipboard=unnamed
+set timeout ttimeoutlen=25
 
 " Remove trailing whitespace
 nnoremap <leader>xtrail :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar><CR>
@@ -87,12 +91,14 @@ nnoremap <silent> <leader>/ :noh<CR>
 set synmaxcol=16384
 
 " multi-line case in python
-autocmd FileType python syn match pythonConditional "^\s*\zscase\%(\s\+.*(.*$\)\@="
+autocmd FileType python syn match pythonConditional "^\s*\zscase\%(\s\+.*(\)\@="
+autocmd FileType python syn match pythonConditional "^\s*\zsmatch\%(\s\+.*(\)\@="
 
 colorscheme onehalfdark
 let g:airline_theme='onehalfdark'
 
 " "hi!" vs "hi" https://stackoverflow.com/a/31146436
+hi ErrorMsg ctermfg=168
 hi CursorLineNr ctermfg=139 ctermbg=237
 hi LineNr ctermfg=139
 hi Comment ctermfg=71
@@ -130,9 +136,6 @@ endfunction
 " :CocCommand semanticTokens.checkCurrent
 " :so $VIMRUNTIME/syntax/hitest.vim
 
-" Make VIM use the gnome clipboard for yanks and pastes
-set clipboard=unnamed
-
 " Map escape-A to alt-A, to fix issue where alt is sent using escape. If
 " there is a 25 ms gap, vim presumes you meant to first press escape, and then
 " A.
@@ -142,9 +145,6 @@ while c <= 'z'
   exec "imap \e".c." <A-".c.">"
   let c = nr2char(1+char2nr(c))
 endw
-
-set timeout ttimeoutlen=25
-" set notimeout
 
 let g:c_no_curly_error=1
 
@@ -205,12 +205,8 @@ hi! link CocSearch Identifier
 hi! link CocFloating IdentifierLight
 hi CocBorderHighlight ctermfg=240
 hi! link CocVirtualText CocBorderHighlight
-
-" TextEdit might fail if hidden is not set.
-set hidden
-
-" Give more space for displaying messages.
-set cmdheight=2
+hi CocWarningHighlight cterm=underline ctermul=130
+hi CocErrorHighlight cterm=underline ctermul=196
 
 " Some servers have issues with backup files, see #649.
 set nobackup
@@ -277,9 +273,73 @@ autocmd CursorHold * silent call CocActionAsync('highlight')
 " Symbol renaming.
 nmap <leader>rn <Plug>(coc-rename)
 
+function! ApplyFormatCommand(command)
+  " Calculate Format
+  let l:content = join(getline(1, '$'), "\n")
+  let l:stderr_file = tempname()
+  let l:format_stdout = system('(' . a:command . ') 2>' . l:stderr_file, l:content)
+  let l:format_stderr = join(readfile(l:stderr_file), "\n")
+  call delete(l:stderr_file)
+
+  if v:shell_error
+    echohl ErrorMsg
+    echo l:command . " formatting failed!"
+    echo l:format_stderr
+    echohl None
+    return 1
+  endif
+
+  " Apply Format
+  " TODO: This if !=# doesn't work
+  if l:format_stdout !=# l:content
+    let l:save_cursor = getpos('.')
+    let l:lines = split(l:format_stdout, "\n")
+    call setline(1, l:lines)
+    if line('$') > len(l:lines)
+      execute len(l:lines) + 1 . ', $delete'
+    endif
+    call setpos('.', l:save_cursor)
+  endif
+
+  return 0
+endfunction
+
+function! PythonFormat()
+  " Find the formatter
+  if executable('black')
+    if ApplyFormatCommand("black -")
+      echo "Linted and Formatted with black"
+    endif
+  elseif executable('ruff')
+    if ApplyFormatCommand("ruff check --fix - | ruff format -")
+      echo "Linted and Formatted with ruff format"
+    endif
+  else
+    echohl ErrorMsg
+    echo "Neither 'black' nor 'ruff' was found in PATH"
+    echohl None
+    return
+  endif
+
+endfunction
+
+function! CodeActionFormat()
+  if CocHasProvider('format')
+    call feedkeys("\<Plug>(coc-format-selected)", 'n')
+  else
+    if &filetype == 'python'
+      call PythonFormat()
+    else
+      echohl ErrorMsg
+      echo "Your LSP does not support formatting"
+      echohl None
+    endif
+  endif
+endfunction
+
 " Formatting selected code. (af = Action-Format)
-xmap <leader>af  <Plug>(coc-format-selected)
-nmap <leader>af  <Plug>(coc-format-selected)
+" xmap <leader>af  :call CodeActionFormat()<CR>
+nmap <leader>af  :call CodeActionFormat()<CR>
 
 augroup mygroup
   autocmd!
@@ -291,8 +351,8 @@ augroup end
 
 " Applying codeAction to the selected region.
 " Example: `<leader>aap` for current paragraph
-xmap <leader>a  <Plug>(coc-codeaction-selection)
-nmap <leader>a  <Plug>(coc-codeaction-cursor)
+xmap <leader>as  <Plug>(coc-codeaction-selection)
+nmap <leader>as  <Plug>(coc-codeaction-cursor)
 
 " Remap keys for applying codeAction to the current buffer.
 " nmap <leader>ac  <Plug>(coc-codeaction)

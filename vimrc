@@ -79,7 +79,7 @@ set showcmd
 set incsearch
 set hlsearch
 set cursorline
-set clipboard=unnamed
+set clipboard=unnamed,unnamedplus
 set timeout ttimeoutlen=25
 
 " Remove trailing whitespace
@@ -152,20 +152,23 @@ let g:c_no_curly_error=1
 
 " Use fd and fd -u
 if executable('fd')
-  let g:fd_binary = 'fd'
+  let g:fd_binary = 'fd --hidden --type file --exclude .git'
 elseif executable('fdfind')
-  let g:fd_binary = 'fdfind'
+  let g:fd_binary = 'fdfind --hidden --type file --exclude .git'
 else
   echo "Neither 'fd' nor 'fdfind' was found in PATH"
 endif
 
 let $FZF_DEFAULT_COMMAND = g:fd_binary
-command! -bang -nargs=? -complete=dir FilesAll
-  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'source': g:fd_binary . ' -u'}), <bang>0)
-
 " Use <C-j> / <C-k> to navigate fzf window
 let $FZF_DEFAULT_OPTS = '--bind "ctrl-j:down,ctrl-k:up,alt-j:preview-down,alt-k:preview-up"'
 
+command! -bang -nargs=? -complete=dir FilesAll
+  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'source': g:fd_binary . ' -u'}), <bang>0)
+
+" --hidden, don't treat hidden .* files, only use ignore files.
+command! -bang -nargs=* RG
+  \ call fzf#vim#grep2("rg --hidden --glob '!.git' --column --line-number --no-heading --color=always --smart-case -- ", <q-args>, fzf#vim#with_preview(), <bang>0)
 " ripgrep with -uuu (max unrestricted)
 command! -bang -nargs=* RGall
   \ call fzf#vim#grep2("rg -uuu --column --line-number --no-heading --color=always --smart-case -- ", <q-args>, fzf#vim#with_preview(), <bang>0)
@@ -193,7 +196,8 @@ let g:coc_global_extensions = [
   \ 'coc-tsserver',
   \ 'coc-html',
   \ 'coc-css',
-  \ 'coc-basedpyright'
+  \ 'coc-basedpyright',
+  \ 'coc-rust-analyzer'
   \ ]
 hi CocInlayHint term=bold cterm=italic ctermfg=245 gui=italic
 hi! link CocSemTypeDecorator Function
@@ -320,20 +324,34 @@ function! PythonFormat()
     echohl None
     return
   endif
+endfunction
 
+function! TypescriptFormat()
+  " Find the formatter
+  if executable('npx')
+    let l:filepath = expand('%:p') " Get the full path of the current file
+    if ApplyFormatCommand("npx prettier --stdin-filepath " . shellescape(l:filepath))
+      echo "Linted and Formatted with prettier"
+    endif
+  else
+    echohl ErrorMsg
+    echo "'npx' was not found in PATH"
+    echohl None
+    return
+  endif
 endfunction
 
 function! CodeActionFormat()
-  if CocHasProvider('format')
+  if &filetype == 'python'
+    call PythonFormat()
+  elseif &filetype == 'typescript'
+    call TypescriptFormat()
+  elseif CocHasProvider('format')
     call feedkeys("\<Plug>(coc-format-selected)", 'n')
   else
-    if &filetype == 'python'
-      call PythonFormat()
-    else
-      echohl ErrorMsg
-      echo "Your LSP does not support formatting"
-      echohl None
-    endif
+    echohl ErrorMsg
+    echo "Your LSP does not support formatting"
+    echohl None
   endif
 endfunction
 
@@ -344,7 +362,7 @@ nmap <leader>af  :call CodeActionFormat()<CR>
 augroup mygroup
   autocmd!
   " Setup formatexpr specified filetype(s).
-  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  autocmd FileType json setl formatexpr=CocAction('formatSelected')
   " Update signature help on jump placeholder.
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
@@ -483,7 +501,5 @@ autocmd FileType c ClangFormatAutoEnable
 
 " ----- vim-commentary settings -----
 
-xmap <leader>c  <Plug>Commentary
-nmap <leader>c  <Plug>Commentary
-omap <leader>c  <Plug>Commentary
-nmap <leader>cc <Plug>CommentaryLine
+noremap <leader>ac <Plug>Commentary
+nnoremap <leader>ac <Plug>CommentaryLine
